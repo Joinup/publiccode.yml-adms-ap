@@ -9,7 +9,7 @@ workspace/graph.ttl: workspace/graph.nt
 	./tools/apache-jena/bin/ntriples --output=turtle namespaces.ttl workspace/graph.nt > workspace/graph.ttl
 
 workspace/graph.nt: $(publiccode-rdf)
-	 find workspace/*/* -type f -name '*.rdf' -exec cat {} \; > workspace/graph.nt
+	cat $(publiccode-rdf) > workspace/graph.nt
 
 workspace/cloned-repos/%.git: tracked-repos/%.git
 	./bin/clone-update.sh $(@F)
@@ -29,8 +29,15 @@ expire:
 	find tracked-repos/* -mmin +1440 -exec touch {}  \;
 
 # Creates an environment with some publiccode.yml repositories.
-provision-testdata:
-	cat test/list-of-repos.txt | xargs -n 1 ./bin/repo-add.sh	
+provision-testdata: remove-tracked-repos
+	cat test/list-of-repos.txt | xargs -n 1 ./bin/add-repository.sh
+
+# Tracks the Italian catalogue (Developers Italia)
+provision-it-data: remove-tracked-repos
+	curl https://crawler.developers.italia.it/softwares.yml | yq e -o=j | jq -r .[].publiccode.url | xargs -n 1 ./bin/add-repository.sh
+
+remove-tracked-repos:
+	rm -f tracked-repos/*
 
 dependencies: tools/rmlmapper.jar tools/apache-jena
 
@@ -47,8 +54,9 @@ tools/apache-jena:
 
 clean:
 	rm workspace/*/* -rf
+	rm workspace/graph.*
 
-.PHONY: update expire fetch dependencies provision-testdata clean
+.PHONY: update expire fetch dependencies provision-testdata provision-it-data remove-tracked-repos clean
 
 # Keep intermediate files for performance.
 .PRECIOUS: workspace/cloned-repos/%.git workspace/publiccode/%/publiccode.yml workspace/publiccode/%/publiccode.json
