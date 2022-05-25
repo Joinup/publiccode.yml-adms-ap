@@ -6,6 +6,8 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix place: <http://data.europa.eu/placeholder/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix adms: <http://www.w3.org/ns/adms#> .
 
 place:TriplesMap a rr:TriplesMap;
   rml:logicalSource [
@@ -18,9 +20,68 @@ place:TriplesMap a rr:TriplesMap;
     rr:class dcat:Asset
   ];
   rr:predicateObjectMap [
-    rr:predicate rdfs:label;
+    rr:predicate dct:description;
+    rr:objectMap [
+      rml:reference "description.en.longDescription"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:title;
     rr:objectMap [
       rml:reference "name"
     ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:publisher;
+    rr:objectMap [
+      rml:reference "legal.mainCopyrightOwner"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dcat:keyword;
+    rr:objectMap [
+      rml:reference "intendedAudience.scope"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dcat:landingPage;
+    rr:objectMap [
+      rml:reference "landingURL"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dcat:theme;
+    rr:objectMap [
+      rml:reference "categories"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:language;
+    rr:objectMap [
+      rml:reference "localisation.availableLanguages"
+    ]
+  ];  
+  rr:predicateObjectMap [
+    rr:predicate dct:relation;
+    rr:objectMap [
+      rml:reference "isBasedOn"
+    ]
+  ];  
+  rr:predicateObjectMap [
+    rr:predicate dct:spatial;
+    rr:objectMap [
+      rml:reference "intendedAudience.countries"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate adms:includedAsset;
+    rr:objectMap [
+      rml:reference "dependsOn.open"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate adms:status;
+    rr:objectMap [
+      rml:reference "developmentStatus"
+    ]
   ].
-
