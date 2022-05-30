@@ -17,6 +17,8 @@ workspace/cloned-repos/%.git: tracked-repos/%.git
 workspace/publiccode/%/publiccode.yml: workspace/cloned-repos/%.git
 	mkdir -p workspace/publiccode/$(*F)
 	-git -C $^ cat-file blob HEAD:publiccode.yml > $@
+#	If the publiccode.yml file isn't valid, blank it out to avoid downstream issues.
+	@docker run -i italia/publiccode-parser-go /dev/stdin < $@ > /dev/null 2>&1 || (echo "" > $@ && echo "\033[0;31mWARNING: File not conformant to publiccode.yml $@\033[0m (skipping)")
 
 workspace/publiccode/%/publiccode.json: workspace/publiccode/%/publiccode.yml
 	-./bin/convert-yaml-to-json.sh $^ > $@
@@ -25,15 +27,15 @@ workspace/publiccode/%/publiccode.rdf: workspace/publiccode/%/publiccode.json pu
 	./bin/transform.sh $@ > $@
 
 expire:
-	# Mark all tracked repo files older than a day for processing.
+# 	Mark all tracked repo files older than a day for processing.
 	find tracked-repos/* -mmin +1440 -exec touch {}  \;
 
 # Creates an environment with some publiccode.yml repositories.
-provision-testdata: remove-tracked-repos
+create-catalogue-testdata: remove-tracked-repos
 	cat test/list-of-repos.txt | xargs -n 1 ./bin/add-repository.sh
 
 # Tracks the Italian catalogue (Developers Italia)
-provision-it-data: remove-tracked-repos
+create-catalogue-it-data: remove-tracked-repos
 	curl https://crawler.developers.italia.it/softwares.yml | yq e -o=j | jq -r .[].publiccode.url | xargs -n 1 ./bin/add-repository.sh
 
 remove-tracked-repos:
@@ -56,7 +58,7 @@ clean:
 	rm workspace/*/* -rf
 	rm workspace/graph.*
 
-.PHONY: update expire fetch dependencies provision-testdata provision-it-data remove-tracked-repos clean
+.PHONY: update expire fetch dependencies create-catalogue-testdata create-catalogue-it-data remove-tracked-repos clean
 
 # Keep intermediate files for performance.
 .PRECIOUS: workspace/cloned-repos/%.git workspace/publiccode/%/publiccode.yml workspace/publiccode/%/publiccode.json
