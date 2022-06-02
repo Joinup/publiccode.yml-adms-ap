@@ -9,7 +9,28 @@
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix adms: <http://www.w3.org/ns/adms#> .
 
-place:TriplesMap a rr:TriplesMap;
+[] a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "publiccode.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$.description[*]"
+  ];
+  rr:subjectMap [
+    rml:reference "subject";
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:description;
+    rr:objectMap [
+      rml:reference "longDescription";
+      rml:languageMap [
+        rml:reference "langcode"
+      ]
+    ]
+  ].
+
+
+
+[] a rr:TriplesMap;
   rml:logicalSource [
     rml:source "publiccode.json";
     rml:referenceFormulation ql:JSONPath;
@@ -18,12 +39,6 @@ place:TriplesMap a rr:TriplesMap;
   rr:subjectMap [
     rml:reference "subject";
     rr:class dcat:Asset
-  ];
-  rr:predicateObjectMap [
-    rr:predicate dct:description;
-    rr:objectMap [
-      rml:reference "description.en.longDescription"
-    ]
   ];
   rr:predicateObjectMap [
     rr:predicate dct:title;
