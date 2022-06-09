@@ -28,6 +28,28 @@
     ]
   ].
 
+# Mappings for controlled vocabulary translation.
+# ADMS status
+ex:status-mapping a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "../../../mappings/status-mapping.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [
+    rml:reference "subject"
+  ].
+
+# Language
+ex:language-mapping a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "../../../mappings/language-mapping.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [ 
+    rml:reference "subject"
+  ].
+
+
 
 
 [] a rr:TriplesMap;
@@ -73,7 +95,12 @@
   rr:predicateObjectMap [
     rr:predicate dct:language;
     rr:objectMap [
-      rml:reference "localisation.availableLanguages"
+      rml:reference "localisation.availableLanguages[*]";
+      #rr:parentTriplesMap ex:language-mapping;
+      #rr:joinCondition [
+      #  rr:child "localisation.availableLanguages[*]";
+      #  rr:parent "langcode";
+      #];
     ]
   ];  
   rr:predicateObjectMap [
@@ -91,12 +118,16 @@
   rr:predicateObjectMap [
     rr:predicate adms:includedAsset;
     rr:objectMap [
-      rml:reference "dependsOn.open"
+      rml:reference "dependsOn.open[*].name"
     ]
   ];
   rr:predicateObjectMap [
     rr:predicate adms:status;
     rr:objectMap [
-      rml:reference "developmentStatus"
+      rr:parentTriplesMap ex:status-mapping;
+      rr:joinCondition [
+        rr:child "developmentStatus";
+        rr:parent "developmentStatus";
+      ];
     ]
   ].

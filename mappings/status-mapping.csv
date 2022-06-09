@@ -1,0 +1,6 @@
+subject,developmentStatus
+http://purl.org/adms/status/UnderDevelopment,concept
+http://purl.org/adms/status/UnderDevelopment,development
+http://purl.org/adms/status/UnderDevelopment,beta
+http://purl.org/adms/status/Completed,stable
+http://purl.org/adms/status/Deprecated,obsolete
