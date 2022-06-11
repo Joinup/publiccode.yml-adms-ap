@@ -4,12 +4,12 @@ This tool tracks publiccode.yml repositories, and (aims to) generates an ADMS-AP
 # Install
 The following tools are required on the system.
 
- -  GNU make
- -  jq (dependency of yq, a tool to manipulate JSON files)
- -  yq (to transform YAML to JSON)
+ -  GNU make (part of the `build-essential` package for UNIX)
+ -  [jq](https://stedolan.github.io/jq/download/) (dependency of yq, a tool to manipulate JSON files)
+ -  [yq](https://github.com/mikefarah/yq) (to transform YAML to JSON) - version > 4.25.0 required
  -  Java JRE (to run RML Mapper)
  -  wget
- -  RML Mapper (install by running `make dependencies`)
+ -  RML Mapper (install by running `make dependencies` after you have installed the above packages)
 
 # Harvesting the 'developers Italia' catalogue
 First, update the list of tracked repositories with the state of the upstream catalogue.
