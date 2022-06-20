@@ -4,12 +4,15 @@ This tool tracks publiccode.yml repositories, and (aims to) generates an ADMS-AP
 # Install
 The following tools are required on the system.
 
- -  GNU make
- -  jq (dependency of yq, a tool to manipulate JSON files)
- -  yq (to transform YAML to JSON)
+ -  GNU make (part of the `build-essential` package for UNIX)
+ -  [jq](https://stedolan.github.io/jq/download/) (dependency of yq, a tool to manipulate JSON files)
+ -  [yq](https://github.com/mikefarah/yq) (to transform YAML to JSON) - version > 4.25.0 required
  -  Java JRE (to run RML Mapper)
  -  wget
- -  RML Mapper (install by running `make dependencies`)
+ -  RML Mapper. Install by running `make dependencies` after you have installed the above packages.
+ Please, note that this will install RML and Apache Jena in `tools` directory.
+ Deleting the contents of the `tools` directory will result in having to
+ re-install the dependencies.
 
 # Harvesting the 'developers Italia' catalogue
 First, update the list of tracked repositories with the state of the upstream catalogue.
@@ -23,7 +26,7 @@ Then continue with 'building the graph'.
 Run `make update` on a regular basis to keep the ADMS-AP catalogue file up-to-date.
 By default the repositories will only be fetched once a day (see expire target).
 
-As make builds a dependency tree of targets, the process can be speed up by running multiple make jobs at once:
+As `make` builds a dependency tree of targets, the process can be speed up by running multiple make jobs at once:
 `make update -j8`
 The latest publiccode.yml file is pulled from each tracked repository on a daily basis, transformed into ADMS-AP, and merged into a graph.
 The graph is made available under workspace/graph.rdf
