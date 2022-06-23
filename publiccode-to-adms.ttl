@@ -3,6 +3,10 @@
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ex: <http://example.com/ns#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix fnml:   <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno: 	<https://w3id.org/function/ontology#> .
+@prefix grel:     <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix idlab-fn: <http://example.com/idlab/function/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
@@ -10,26 +14,7 @@
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix adms: <http://www.w3.org/ns/adms#> .
 
-[] a rr:TriplesMap;
-  rml:logicalSource [
-    rml:source "publiccode.json";
-    rml:referenceFormulation ql:JSONPath;
-    rml:iterator "$.description[*]"
-  ];
-  rr:subjectMap [
-    rml:reference "subject";
-  ];
-  rr:predicateObjectMap [
-    rr:predicate dct:description;
-    rr:objectMap [
-      rml:reference "longDescription";
-      rml:languageMap [
-        rml:reference "langcode"
-      ]
-    ]
-  ].
-
-# Mappings for controlled vocabulary translation.
+# Data source declarations for controlled vocabulary mappings.
 # ADMS status
 ex:status-mapping a rr:TriplesMap;
   rml:logicalSource [
@@ -61,27 +46,78 @@ ex:country-mapping a rr:TriplesMap;
   ].
 
 
+# Field mappings
+# Description
 [] a rr:TriplesMap;
   rml:logicalSource [
     rml:source "publiccode.json";
     rml:referenceFormulation ql:JSONPath;
-    rml:iterator "$"
+    rml:iterator "$.description[*]"
   ];
+  rr:subjectMap [
+    rml:reference "subject";
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:description;
+    rr:objectMap [
+      rml:reference "longDescription";
+      rml:languageMap [
+        rml:reference "langcode"
+      ]
+    ]
+  ].
+
+ex:publiccode-source
+    rml:source "publiccode.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$" .
+
+ex:agent-mapping a rr:TriplesMap;
+  rml:logicalSource ex:publiccode-source;
+  rr:subjectMap [
+    rr:class foaf:Agent;
+    rr:termType rr:BlankNode;
+    fnml:functionValue [
+      rr:predicateObjectMap [
+        rr:predicate fno:executes ;
+        rr:objectMap [ rr:constant idlab-fn:slugify ]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:str ;
+        rr:objectMap [ rml:reference "legal.mainCopyrightOwner"]
+      ];
+    ];
+  ];
+  rr:predicateObjectMap [
+    rr:predicate foaf:name;
+    rr:objectMap [
+      rml:reference "legal.mainCopyrightOwner"
+    ]
+  ].
+
+[] a rr:TriplesMap;
+  rml:logicalSource ex:publiccode-source;
   rr:subjectMap [
     rml:reference "subject";
     rr:class dcat:Asset
   ];
+  # Title
   rr:predicateObjectMap [
     rr:predicate dct:title;
     rr:objectMap [
       rml:reference "name"
     ]
   ];
+
   rr:predicateObjectMap [
     rr:predicate dct:publisher;
     rr:objectMap [
-      rml:reference "legal.mainCopyrightOwner"
-    ]
+      rr:parentTriplesMap ex:agent-mapping;
+      rr:joinCondition [
+        rr:child "legal.mainCopyrightOwner";
+        rr:parent "legal.mainCopyrightOwner";
+      ];
+    ];
   ];
   rr:predicateObjectMap [
     rr:predicate dcat:keyword;
@@ -171,13 +207,6 @@ ex:country-mapping a rr:TriplesMap;
       ];
     ]
   ];
-
-
-
-
-
-
-
 
   rr:predicateObjectMap [
     rr:predicate adms:includedAsset;
