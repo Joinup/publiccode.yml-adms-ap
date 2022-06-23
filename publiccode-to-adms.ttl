@@ -13,10 +13,11 @@
 @prefix place: <http://data.europa.eu/placeholder/> .
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix adms: <http://www.w3.org/ns/adms#> .
+@prefix v: <http://www.w3.org/2006/vcard/ns#> .
 
 # Data source declarations for controlled vocabulary mappings.
 # ADMS status
-ex:status-mapping a rr:TriplesMap;
+ex:triplemap-status a rr:TriplesMap;
   rml:logicalSource [
     rml:source "../../../mappings/status-mapping.csv" ;
     rml:referenceFormulation ql:CSV
@@ -26,7 +27,7 @@ ex:status-mapping a rr:TriplesMap;
   ].
 
 # Language
-ex:language-mapping a rr:TriplesMap;
+ex:triplemap-language a rr:TriplesMap;
   rml:logicalSource [
     rml:source "../../../mappings/language-mapping.csv" ;
     rml:referenceFormulation ql:CSV
@@ -36,7 +37,7 @@ ex:language-mapping a rr:TriplesMap;
   ].
 
 # Country
-ex:country-mapping a rr:TriplesMap;
+ex:triplemap-country a rr:TriplesMap;
   rml:logicalSource [
     rml:source "../../../mappings/country-mapping.csv" ;
     rml:referenceFormulation ql:CSV
@@ -67,13 +68,38 @@ ex:country-mapping a rr:TriplesMap;
     ]
   ].
 
-ex:publiccode-source
+# Contact info terms
+[] a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "publiccode.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$.maintenance.contacts[*]"
+  ];
+  rr:subjectMap [
+    rml:reference "subject";
+  ];
+
+  # Contact info
+  rr:predicateObjectMap [
+    rr:predicate dcat:contactPoint;
+    rr:objectMap [
+      rr:parentTriplesMap ex:triplemap-contact;
+      # Use the contact name to join on the triplemap.
+      rr:joinCondition [
+        rr:child "name";
+        rr:parent "name";
+      ];
+    ];
+  ].
+
+ex:logicsource-publiccode
     rml:source "publiccode.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$" .
 
-ex:agent-mapping a rr:TriplesMap;
-  rml:logicalSource ex:publiccode-source;
+# Creates all triples in the blanknode for the publisher (agent).
+ex:triplemap-agent a rr:TriplesMap;
+  rml:logicalSource ex:logicsource-publiccode;
   rr:subjectMap [
     rr:class foaf:Agent;
     rr:termType rr:BlankNode;
@@ -95,8 +121,44 @@ ex:agent-mapping a rr:TriplesMap;
     ]
   ].
 
-[] a rr:TriplesMap;
-  rml:logicalSource ex:publiccode-source;
+# Creates all triples in the blanknode for the contact info (v:Kind).
+ex:triplemap-contact a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "publiccode.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$.maintenance.contacts[*]"
+  ];
+  rr:subjectMap [
+    rr:class v:Kind;
+    rr:termType rr:BlankNode;
+    fnml:functionValue [
+      rr:predicateObjectMap [
+        rr:predicate fno:executes ;
+        rr:objectMap [ rr:constant idlab-fn:slugify ]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:str ;
+        rr:objectMap [ rml:reference "name"]
+      ];
+    ];
+  ];
+  # Contact - name
+  rr:predicateObjectMap [
+    rr:predicate v:fn;
+    rr:objectMap [
+      rml:reference "name"
+    ]
+  ];
+  # Contact - email
+  rr:predicateObjectMap [
+    rr:predicate v:hasEmail;
+    rr:objectMap [
+      rml:reference "email"
+    ]
+  ].
+
+ex:triplemap-main a rr:TriplesMap;
+  rml:logicalSource ex:logicsource-publiccode;
   rr:subjectMap [
     rml:reference "subject";
     rr:class dcat:Asset
@@ -108,42 +170,47 @@ ex:agent-mapping a rr:TriplesMap;
       rml:reference "name"
     ]
   ];
-
+  # Publisher
   rr:predicateObjectMap [
     rr:predicate dct:publisher;
     rr:objectMap [
-      rr:parentTriplesMap ex:agent-mapping;
+      rr:parentTriplesMap ex:triplemap-agent;
+      # Use the publisher name to join on the triplemap.
       rr:joinCondition [
         rr:child "legal.mainCopyrightOwner";
         rr:parent "legal.mainCopyrightOwner";
       ];
     ];
   ];
+
+  # Keyword
   rr:predicateObjectMap [
     rr:predicate dcat:keyword;
     rr:objectMap [
       rml:reference "intendedAudience.scope"
     ]
   ];
+  # LandingURL
   rr:predicateObjectMap [
     rr:predicate dcat:landingPage;
     rr:objectMap [
       rml:reference "landingURL"
     ]
   ];
+  # Theme
   rr:predicateObjectMap [
     rr:predicate dcat:theme;
     rr:objectMap [
       rml:reference "categories"
     ]
   ];
-
-  # Joining on two arrays seems broken, so access available languages one by one. Assume max 3 languages.
+  # Language
+  # As joining two arrays seems broken, access available languages one by one. Assume max 3 languages.
   # First element
   rr:predicateObjectMap [
     rr:predicate dct:language;
     rr:objectMap [
-      rr:parentTriplesMap ex:language-mapping;
+      rr:parentTriplesMap ex:triplemap-language;
       rr:joinCondition [
         rr:child "localisation.availableLanguages[0]";
         rr:parent "langcode";
@@ -153,7 +220,7 @@ ex:agent-mapping a rr:TriplesMap;
   rr:predicateObjectMap [
     rr:predicate dct:language;
     rr:objectMap [
-      rr:parentTriplesMap ex:language-mapping;
+      rr:parentTriplesMap ex:triplemap-language;
       rr:joinCondition [
         rr:child "localisation.availableLanguages[1]";
         rr:parent "langcode";
@@ -163,7 +230,7 @@ ex:agent-mapping a rr:TriplesMap;
   rr:predicateObjectMap [
     rr:predicate dct:language;
     rr:objectMap [
-      rr:parentTriplesMap ex:language-mapping;
+      rr:parentTriplesMap ex:triplemap-language;
       rr:joinCondition [
         rr:child "localisation.availableLanguages[2]";
         rr:parent "langcode";
@@ -176,11 +243,11 @@ ex:agent-mapping a rr:TriplesMap;
       rml:reference "isBasedOn"
     ]
   ];
-  # Joining on two arrays seems broken, so access available countrues one by one. Assume max 3 countries.
+  # Same issue with countries, handle max 3 items one by one.
   rr:predicateObjectMap [
     rr:predicate dct:spatial;
     rr:objectMap [
-      rr:parentTriplesMap ex:country-mapping;
+      rr:parentTriplesMap ex:triplemap-country;
       rr:joinCondition [
         rr:child "intendedAudience.countries[0]";
         rr:parent "code";
@@ -190,7 +257,7 @@ ex:agent-mapping a rr:TriplesMap;
   rr:predicateObjectMap [
     rr:predicate dct:spatial;
     rr:objectMap [
-      rr:parentTriplesMap ex:country-mapping;
+      rr:parentTriplesMap ex:triplemap-country;
       rr:joinCondition [
         rr:child "intendedAudience.countries[1]";
         rr:parent "code";
@@ -200,24 +267,25 @@ ex:agent-mapping a rr:TriplesMap;
   rr:predicateObjectMap [
     rr:predicate dct:spatial;
     rr:objectMap [
-      rr:parentTriplesMap ex:country-mapping;
+      rr:parentTriplesMap ex:triplemap-country;
       rr:joinCondition [
         rr:child "intendedAudience.countries[2]";
         rr:parent "code";
       ];
     ]
   ];
-
+  # Included asset
   rr:predicateObjectMap [
     rr:predicate adms:includedAsset;
     rr:objectMap [
       rml:reference "dependsOn.open[*].name"
     ]
   ];
+  # Status
   rr:predicateObjectMap [
     rr:predicate adms:status;
     rr:objectMap [
-      rr:parentTriplesMap ex:status-mapping;
+      rr:parentTriplesMap ex:triplemap-status;
       rr:joinCondition [
         rr:child "developmentStatus";
         rr:parent "developmentStatus";
