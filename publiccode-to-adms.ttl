@@ -14,6 +14,7 @@
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix adms: <http://www.w3.org/ns/adms#> .
 @prefix v: <http://www.w3.org/2006/vcard/ns#> .
+@prefix dr8: <http://data.europa.eu/dr8/> .
 
 # Data source declarations for controlled vocabulary mappings.
 # ADMS status
@@ -297,5 +298,12 @@ ex:triplemap-main a rr:TriplesMap;
         rr:child "developmentStatus";
         rr:parent "developmentStatus";
       ];
+    ]
+  ];
+  # EIRA ABB is required, so add static mapping :)
+  rr:predicateObjectMap [
+    rr:predicate dct:relation;
+    rr:objectMap [
+      rr:constant dr8:DigitalSolution
     ]
   ].
