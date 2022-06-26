@@ -134,6 +134,36 @@ ex:triplemap-agent a rr:TriplesMap;
     ]
   ].
 
+# Creates all triples in the blanknode for the Distribution
+ex:triplemap-distribution a rr:TriplesMap;
+  rml:logicalSource ex:logicsource-publiccode;
+  rr:subjectMap [
+    rr:class dcat:Distribution ;
+    rr:termType rr:BlankNode;
+    fnml:functionValue [
+      rr:predicateObjectMap [
+        rr:predicate fno:executes ;
+        rr:objectMap [ rr:constant idlab-fn:slugify ]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:str ;
+        rr:objectMap [ rml:reference "url"]
+      ];
+    ];
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:license ;
+    rr:objectMap [
+      rr:template "http://spdx.org/licenses/{legal.license}"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dcat:accessURL ;
+    rr:objectMap [
+      rml:reference "url"
+    ]
+  ].
+
 # Creates all triples in the blanknode for the contact info (v:Kind).
 ex:triplemap-contact a rr:TriplesMap;
   rml:logicalSource [
@@ -202,7 +232,18 @@ ex:triplemap-main a rr:TriplesMap;
       ];
     ];
   ];
-
+  # Distribution
+  rr:predicateObjectMap [
+    rr:predicate dcat:distribution;
+    rr:objectMap [
+      rr:parentTriplesMap ex:triplemap-distribution;
+      # Use the publisher name to join on the triplemap.
+      rr:joinCondition [
+        rr:child "url";
+        rr:parent "url";
+      ];
+    ];
+  ];
   # Keyword
   rr:predicateObjectMap [
     rr:predicate dcat:keyword;
