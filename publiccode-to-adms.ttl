@@ -15,6 +15,7 @@
 @prefix adms: <http://www.w3.org/ns/adms#> .
 @prefix v: <http://www.w3.org/2006/vcard/ns#> .
 @prefix dr8: <http://data.europa.eu/dr8/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 # Data source declarations for controlled vocabulary mappings.
 # ADMS status
@@ -245,10 +246,25 @@ ex:triplemap-main a rr:TriplesMap;
       ];
     ]
   ];
+  # Relation
   rr:predicateObjectMap [
     rr:predicate dct:relation;
     rr:objectMap [
       rml:reference "isBasedOn"
+    ]
+  ];
+  # Modified
+  rr:predicateObjectMap [
+    rr:predicate dct:modified;
+    rr:objectMap [
+      rml:reference "releaseDate"
+    ]
+  ];
+  # Version
+  rr:predicateObjectMap [
+    rr:predicate owl:versionInfo;
+    rr:objectMap [
+      rml:reference "softwareVersion"
     ]
   ];
   # Same issue with countries, handle max 3 items one by one.
