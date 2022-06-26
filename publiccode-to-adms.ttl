@@ -16,6 +16,8 @@
 @prefix v: <http://www.w3.org/2006/vcard/ns#> .
 @prefix dr8: <http://data.europa.eu/dr8/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
 
 # Data source declarations for controlled vocabulary mappings.
 # ADMS status
@@ -64,6 +66,15 @@ ex:triplemap-country a rr:TriplesMap;
     rr:predicate dct:description;
     rr:objectMap [
       rml:reference "longDescription";
+      rml:languageMap [
+        rml:reference "langcode"
+      ]
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate skos:altLabel;
+    rr:objectMap [
+      rml:reference "genericName";
       rml:languageMap [
         rml:reference "langcode"
       ]
