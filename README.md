@@ -8,7 +8,7 @@ The publiccode.yml federation process has muliple steps:
 First, potential catalogues must be identified. The only thing a catalogue must supply, is the list of repostories (and as such reusable solutions) that it is compose of.
 The only public catalogue identified today is the one provided by 'Team digitale'.
 
-## Tracking the repsotories
+## Tracking the repositories
 Each of the repositories identified gets 'tracked', meaning that the URL of the repository is registered.
 
 ## Each repository: from publiccode.yml to RDF
