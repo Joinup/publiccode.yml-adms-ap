@@ -1,5 +1,50 @@
 # Publiccode.yml to ADMS-AP knowledge graph generation
-This tool tracks publiccode.yml repositories, and (aims to) generates an ADMS-AP complient knowledge graph from them.
+This tool tracks publiccode.yml repositories, and generates an ADMS-AP complient knowledge graph from them.
+
+# Process
+The publiccode.yml federation process has muliple steps:
+
+## Catalogue identification
+First, potential catalogues must be identified. The only thing a catalogue must supply, is the list of repostories (and as such reusable solutions) that it is compose of.
+The only public catalogue identified today is the one provided by 'Team digitale'.
+
+## Tracking the repsotories
+Each of the repositories identified gets 'tracked', meaning that the URL of the repository is registered.
+
+## Each repository: from publiccode.yml to RDF
+The following operations are executed for each repository. The steps are executed in order for each repository. 
+
+### Fetching the repositories
+The git repositories are then fetched:
+- New repositories are cloned
+- Existing repositories are updated
+
+Only the commit history is downloaded at this point, as the actual repository content is not needed: it would slow the process down, and take up unneeded disk space.
+
+### Extracting
+From the git repostory, the puliccode.yml file is requested. As no blob objects are downloaded while cloning or updating, this might require git to fetch the file from the upstream repository.
+
+### YAML to JSON
+YAML isn't supported by the RDFMapper that executes the data transformation, so the publiccode.yml file is converted to publiccode.json.
+This operation is a one on one convertion, similar to saving a file from excel to csv.
+
+### Validation
+The YAML file is checked for conformance to publiccode.yml standard. Non-conformant repositories are reported and excluded from further processing.
+
+### JSON preprocessing
+The data structure of the JSON file is challenging to transform directly, hence some preprocessing is done:
+- Add the repository URL to all objects in the file (all levels).
+- Flatten the structure of language codes of the 'description' field of publiccode.
+
+### Transformation
+The data transformation is performed by the execution of the RML mapper script. The transformation rules are defined in publiccode-to-adms.ttl
+The transformation results in an RDF file (one for each repository).
+
+## Aggregation
+All the individual transformed repositories are now brought togheter in one big file (graph).
+
+## Upload to Joinup
+The resulting ADMS-AP file can now be uploaded to Joinup for import into a Joinup collection.
 
 # Install
 The following tools are required on the system.
