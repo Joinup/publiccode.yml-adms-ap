@@ -5,8 +5,11 @@ publiccode-rdf := $(subst .git,/publiccode.rdf,$(publiccode))
 
 update: expire workspace/graph.ttl
 
-workspace/graph.ttl: workspace/graph.nt
-	./tools/apache-jena/bin/ntriples --output=turtle namespaces.ttl workspace/graph.nt > workspace/graph.ttl
+workspace/graph.ttl: workspace/graph.nt workspace/inferred-triples.ttl
+	./tools/apache-jena/bin/ntriples --output=turtle namespaces.ttl workspace/inferred-triples.ttl workspace/graph.nt > workspace/graph.ttl
+
+workspace/inferred-triples.ttl: workspace/graph.nt
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-publisher.rq > workspace/inferred-triples.ttl
 
 workspace/graph.nt: $(publiccode-rdf)
 	cat $(publiccode-rdf) > workspace/graph.nt

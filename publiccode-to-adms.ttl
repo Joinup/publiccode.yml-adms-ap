@@ -160,7 +160,8 @@ ex:triplemap-distribution a rr:TriplesMap;
   rr:predicateObjectMap [
     rr:predicate dcat:accessURL ;
     rr:objectMap [
-      rml:reference "url"
+      rml:reference "url" ;
+      rr:termType rr:IRI
     ]
   ].
 
@@ -211,7 +212,7 @@ ex:triplemap-main a rr:TriplesMap;
   rml:logicalSource ex:logicsource-publiccode;
   rr:subjectMap [
     rml:reference "subject";
-    rr:class dcat:Asset
+    rr:class dcat:Dataset
   ];
   # Title
   rr:predicateObjectMap [
@@ -302,14 +303,16 @@ ex:triplemap-main a rr:TriplesMap;
   rr:predicateObjectMap [
     rr:predicate dct:relation;
     rr:objectMap [
-      rml:reference "isBasedOn"
+      rml:reference "isBasedOn" ;
+      rr:termType rr:IRI
     ]
   ];
   # Modified
   rr:predicateObjectMap [
     rr:predicate dct:modified;
     rr:objectMap [
-      rml:reference "releaseDate"
+      rml:reference "releaseDate" ;
+      rr:datatype xsd:DateTime
     ]
   ];
   # Version
