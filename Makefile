@@ -5,11 +5,20 @@ publiccode-rdf := $(subst .git,/publiccode.rdf,$(publiccode))
 
 update: expire workspace/graph.ttl
 
-workspace/graph.ttl: workspace/graph.nt workspace/inferred-triples.ttl
-	./tools/apache-jena/bin/ntriples --output=turtle namespaces.ttl workspace/inferred-triples.ttl workspace/graph.nt > workspace/graph.ttl
+workspace/graph.ttl: workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl
+	./tools/apache-jena/bin/ntriples --formatted=turtle namespaces.ttl workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl > workspace/graph.ttl
 
-workspace/inferred-triples.ttl: workspace/graph.nt
-	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-publisher.rq > workspace/inferred-triples.ttl
+# Warning: output contains input graph + inferred triples.
+workspace/inferred-contact-email.ttl: workspace/graph.nt mappings/infer-contact-email.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-contact-email.rq > workspace/inferred-contact-email.ttl
+
+# Warning: output contains inferred triples only.
+workspace/inferred-missing-contacts.ttl: workspace/graph.nt mappings/infer-missing-contact.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-missing-contact.rq > workspace/inferred-missing-contacts.ttl
+
+# Warning: output contains inferred triples only.
+workspace/inferred-publisher.ttl: workspace/graph.nt mappings/infer-publisher.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-publisher.rq > workspace/inferred-publisher.ttl
 
 workspace/graph.nt: $(publiccode-rdf)
 	cat $(publiccode-rdf) > workspace/graph.nt
@@ -47,7 +56,8 @@ remove-tracked-repos:
 dependencies: tools/rmlmapper.jar tools/apache-jena
 
 tools/rmlmapper.jar:
-	wget https://github.com/RMLio/rmlmapper-java/releases/download/v4.13.0/rmlmapper-4.13.0-r359-all.jar -O tools/rmlmapper.jar
+	# wget https://github.com/RMLio/rmlmapper-java/releases/download/v4.13.0/rmlmapper-4.13.0-r359-all.jar -O tools/rmlmapper.jar
+	wget https://github.com/RMLio/rmlmapper-java/releases/download/v6.0.0/rmlmapper-6.0.0-r363-all.jar -O tools/rmlmapper.jar
 	# Note: Other dependencies are required, such as wget, java-jre, jq and yq.
 
 tools/apache-jena:

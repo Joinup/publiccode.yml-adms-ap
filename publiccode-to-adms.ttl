@@ -311,8 +311,21 @@ ex:triplemap-main a rr:TriplesMap;
   rr:predicateObjectMap [
     rr:predicate dct:modified;
     rr:objectMap [
-      rml:reference "releaseDate" ;
-      rr:datatype xsd:DateTime
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes ;
+          rr:objectMap [ rr:constant idlab-fn:normalizeDateTime ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate idlab-fn:pattern ;
+          rr:objectMap [ rr:constant "yyyy-MM-dd mm:HH"]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate idlab-fn:strDate ;
+          rr:objectMap [ rml:reference "releaseDate"]
+        ];
+      ];
+      rr:datatype xsd:dateTime
     ]
   ];
   # Version

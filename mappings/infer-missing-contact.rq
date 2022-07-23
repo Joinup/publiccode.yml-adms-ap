@@ -1,0 +1,22 @@
+# Hack to infer a pseudo publisher from the respository name.
+
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX v: <http://www.w3.org/2006/vcard/ns#>
+CONSTRUCT 
+{
+  ?solution dcat:contactPoint _:contact .
+  _:contact a v:Kind .
+  _:contact v:fn "Joinup support" .
+  _:contact v:hasEmail "DIGIT-JOINUP-SUPPORT@ec.europa.eu" .
+}
+
+WHERE
+{ 
+  ?solution a dcat:Dataset .
+  OPTIONAL {
+    ?solution dcat:contactPoint ?contact .
+  }
+  FILTER (!bound(?contact)) .
+}
