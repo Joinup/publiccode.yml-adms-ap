@@ -1,5 +1,30 @@
-# Publiccode.yml to ADMS-AP knowledge graph generation
-This tool tracks publiccode.yml repositories, and generates an ADMS-AP complient knowledge graph from them.
+# Harvesting publiccode.yml catalogues
+Catalogues like Joinup facilitate the discoverability of reusable interoperability solutions. 
+Often, similar initiatives exists at the memberstate level, which leads to the possibility of federating those catalogues at the european level.
+
+Two datastandards are currently in use for building such catalogues, each with its specificities.
+
+## ADMS-AP
+This specification covers the full domain of asset catalogues, including the description of the catalogue itself.
+Its model is based on linked data (RDF), which makes offers advantages when combining data from multiple sources. 
+It's most important traits are:
+- Relatively difficult to implement
+- Describes: Interoperability solutions (open source software, standards & specifications, methodologies,...)
+- Technical serialisation: Linked data (RDF)
+- Description: External to the system. The act of cataloguing is considered external to the development of the solution.
+- Governance: Change control managed by working groups with member state representatives organised by SEMIC action of the Digital Europe Programme.
+- Identifiers: URIs are minted by the source catalogue.
+- Model coverage: Catalogue, Solution, Release, Distribution (and auxiliary classes)
+
+## Publiccode.yml
+This specification is focused on Open Source Software. A YAML file in the repository is all that is needed, which can improve the timeliness of the metadata updates, and lead to a better data quality.
+- Relatively easy to implement
+- Describes: Open source software (definition of a catalogue is not covered, as such methodology of harvesting a catalogue is not defined)
+- Technical serialisation: YAML file
+- Description: Self descriptive, the description is maintained in the source code repository of the software
+- Governance: Change control managed by the 'Foundation for Public Code'.
+- Identifiers: Not really considered (moving a repo can cause issues)
+- Model coverage: Software solution
 
 # Process
 The publiccode.yml federation process has muliple steps:
