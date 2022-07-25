@@ -6,9 +6,9 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
 CONSTRUCT 
 {
-  ?solution dct:publisher _:pub .
-  _:pub foaf:name ?title .
-  _:pub a foaf:Agent
+  ?solution dct:publisher ?publisher_uri .
+  ?publisher_uri foaf:name ?title .
+  ?publisher_uri a foaf:Agent
 }
 WHERE
 { 
@@ -18,4 +18,5 @@ WHERE
     ?solution dct:publisher ?publisher .
   }
   FILTER (!bound(?publisher)) .
+  BIND(CONCAT(STR( ?solution ), "/publisher")  AS ?publisher_uri ) .
 }
