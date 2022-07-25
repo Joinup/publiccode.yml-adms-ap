@@ -110,7 +110,7 @@ ex:logicsource-publiccode
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$" .
 
-# Creates all triples in the blanknode for the publisher (agent).
+# Creates all triples for the publisher (agent).
 ex:triplemap-agent a rr:TriplesMap;
   rml:logicalSource ex:logicsource-publiccode;
   rr:subjectMap [
@@ -152,20 +152,25 @@ ex:triplemap-agent a rr:TriplesMap;
     ]
   ].
 
-# Creates all triples in the blanknode for the Distribution
+# Creates all triples for the Distribution
 ex:triplemap-distribution a rr:TriplesMap;
   rml:logicalSource ex:logicsource-publiccode;
   rr:subjectMap [
     rr:class dcat:Distribution ;
-    rr:termType rr:BlankNode;
     fnml:functionValue [
       rr:predicateObjectMap [
         rr:predicate fno:executes ;
-        rr:objectMap [ rr:constant idlab-fn:slugify ]
+        rr:objectMap [ rr:constant idlab-fn:concat ]
       ];
       rr:predicateObjectMap [
-        rr:predicate idlab-fn:str ;
-        rr:objectMap [ rml:reference "url"]
+        rr:predicate idlab-fn:str;
+        rr:objectMap [ rml:reference "subject"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:otherStr ;
+        rr:objectMap [
+          rr:constant "/distribution"
+        ]
       ];
     ];
   ];
