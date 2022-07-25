@@ -197,15 +197,33 @@ ex:triplemap-contact a rr:TriplesMap;
   ];
   rr:subjectMap [
     rr:class v:Kind;
-    rr:termType rr:BlankNode;
     fnml:functionValue [
       rr:predicateObjectMap [
         rr:predicate fno:executes ;
-        rr:objectMap [ rr:constant idlab-fn:slugify ]
+        rr:objectMap [ rr:constant idlab-fn:concat ]
       ];
       rr:predicateObjectMap [
-        rr:predicate idlab-fn:str ;
-        rr:objectMap [ rml:reference "name"]
+        rr:predicate idlab-fn:delimiter ;
+        rr:objectMap [ rr:constant "/contact/"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:str;
+        rr:objectMap [ rml:reference "subject"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:otherStr ;
+        rr:objectMap [
+          fnml:functionValue [
+            rr:predicateObjectMap [
+              rr:predicate fno:executes ;
+              rr:objectMap [ rr:constant idlab-fn:slugify ]
+            ];
+            rr:predicateObjectMap [
+              rr:predicate idlab-fn:str ;
+              rr:objectMap [ rml:reference "name"]
+            ];
+          ];
+        ]
       ];
     ];
   ];
