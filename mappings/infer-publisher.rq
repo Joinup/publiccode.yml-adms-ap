@@ -18,5 +18,5 @@ WHERE
     ?solution dct:publisher ?publisher .
   }
   FILTER (!bound(?publisher)) .
-  BIND(CONCAT(STR( ?solution ), "/publisher")  AS ?publisher_uri ) .
+  BIND(URI(CONCAT(STR( ?solution ), "/publisher"))  AS ?publisher_uri ) .
 }

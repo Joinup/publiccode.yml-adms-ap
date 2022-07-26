@@ -224,6 +224,12 @@ ex:triplemap-distribution a rr:TriplesMap;
       rml:reference "url" ;
       rr:termType rr:IRI
     ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:title;
+    rr:objectMap [
+      rml:reference "name"
+    ]
   ].
 
 # Creates all triples in the blanknode for the contact info (v:Kind).
@@ -379,13 +385,13 @@ ex:triplemap-main a rr:TriplesMap;
     ]
   ];
   # Relation
-  rr:predicateObjectMap [
-    rr:predicate dct:relation;
-    rr:objectMap [
-      rml:reference "isBasedOn" ;
-      rr:termType rr:IRI
-    ]
-  ];
+  #rr:predicateObjectMap [
+  #  rr:predicate dct:relation;
+  #  rr:objectMap [
+  #    rml:reference "isBasedOn" ;
+  #    rr:termType rr:IRI
+  #  ]
+  #];
   # Modified
   rr:predicateObjectMap [
     rr:predicate dct:modified;
@@ -446,12 +452,12 @@ ex:triplemap-main a rr:TriplesMap;
     ]
   ];
   # Included asset
-  rr:predicateObjectMap [
-    rr:predicate adms:includedAsset;
-    rr:objectMap [
-      rml:reference "dependsOn.open[*].name"
-    ]
-  ];
+  #rr:predicateObjectMap [
+  #  rr:predicate adms:includedAsset;
+  #  rr:objectMap [
+  #    rml:reference "dependsOn.open[*].name"
+  #  ]
+  #];
   # Status
   rr:predicateObjectMap [
     rr:predicate adms:status;
@@ -462,11 +468,11 @@ ex:triplemap-main a rr:TriplesMap;
         rr:parent "developmentStatus";
       ];
     ]
-  ];
-  # EIRA ABB is required, so add static mapping :)
-  rr:predicateObjectMap [
-    rr:predicate dct:relation;
-    rr:objectMap [
-      rr:constant dr8:DigitalSolution
-    ]
   ].
+  # EIRA ABB is required, so add static mapping :)
+  #rr:predicateObjectMap [
+  #  rr:predicate dct:relation;
+  #  rr:objectMap [
+  #    rr:constant dr8:DigitalSolution
+  #  ]
+  #].

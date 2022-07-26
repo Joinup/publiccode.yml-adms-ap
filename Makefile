@@ -5,8 +5,8 @@ publiccode-rdf := $(subst .git,/publiccode.rdf,$(publiccode))
 
 update: expire workspace/graph.ttl
 
-workspace/graph.ttl: workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl
-	./tools/apache-jena/bin/ntriples --formatted=turtle namespaces.ttl workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl > workspace/graph.ttl
+workspace/graph.ttl: workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl workspace/inferred-en-description.ttl
+	./tools/apache-jena/bin/ntriples --formatted=turtle namespaces.ttl workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl workspace/inferred-en-description.ttl > workspace/graph.ttl
 
 # Warning: output contains input graph + inferred triples.
 workspace/inferred-contact-email.ttl: workspace/graph.nt mappings/infer-contact-email.rq
@@ -19,6 +19,9 @@ workspace/inferred-missing-contacts.ttl: workspace/graph.nt mappings/infer-missi
 # Warning: output contains inferred triples only.
 workspace/inferred-publisher.ttl: workspace/graph.nt mappings/infer-publisher.rq
 	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-publisher.rq > workspace/inferred-publisher.ttl
+
+workspace/inferred-en-description.ttl: workspace/graph.nt mappings/infer-english-description.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-english-description.rq > workspace/inferred-en-description.ttl
 
 workspace/graph.nt: $(publiccode-rdf)
 	cat $(publiccode-rdf) > workspace/graph.nt
