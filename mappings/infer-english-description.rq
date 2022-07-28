@@ -1,16 +1,13 @@
-# Hack to infer an english description from another language.
-# This is obviously a bad idea. This should be translated...
-
+# Run machine translation on non-english descriptions.
 PREFIX dcat: <http://www.w3.org/ns/dcat#>
 PREFIX dct: <http://purl.org/dc/terms/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX f: <java:eu.europa.ec.sparql.shell.>
 
-CONSTRUCT 
-{
-  ?solution dct:description ?fake_en_desc .
+CONSTRUCT {
+  ?solution dct:description ?eng_description .
 }
-WHERE
-{ 
+WHERE {
   ?solution a dcat:Dataset .
   ?solution dct:description ?description .
   OPTIONAL {
@@ -18,12 +15,7 @@ WHERE
     FILTER langMatches( lang(?desc_filter), "en" )
   }
   FILTER (!BOUND(?desc_filter))
-  BIND(STRLANG(STR(?description), "en") as ?fake_en_desc)
 
-
-  #OPTIONAL {
-  #  ?solution dct:publisher ?publisher .
-  #}
-  #FILTER (!bound(?publisher)) .
-  #BIND(URI(CONCAT(STR( ?solution ), "/publisher"))  AS ?publisher_uri ) .
+  BIND(CONCAT("./bin/translate.sh ", LANG(?description), " en") as ?cmd)
+  BIND(f:Exec(?cmd, ?description) as ?eng_description)
 }

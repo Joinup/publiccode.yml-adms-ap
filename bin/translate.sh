@@ -20,6 +20,7 @@ REQUEST=$(jq --null-input \
 CACHE_ID=$(echo $REQUEST | sha1sum | cut -f1 -d' ') 
 if [ ! -f "$CACHE_DIR$CACHE_ID" ];
 then
+	# This needs error checking. If service doesn't respond,... don't write the cache entry :)
 	curl -s -H 'Content-Type: application/json' --data-binary "$REQUEST" https://europa.eu/webtools/rest/etrans/translate | jq -r .translation | base64 -d > $CACHE_DIR$CACHE_ID
 fi
 cat $CACHE_DIR$CACHE_ID

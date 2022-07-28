@@ -56,7 +56,7 @@ create-catalogue-it-data: remove-tracked-repos
 remove-tracked-repos:
 	rm -f tracked-repos/*
 
-dependencies: tools/rmlmapper.jar tools/apache-jena
+dependencies: tools/rmlmapper.jar tools/apache-jena tools/apache-jena/lib/sparql-shell-1.0-SNAPSHOT.jar
 
 tools/rmlmapper.jar:
 	# wget https://github.com/RMLio/rmlmapper-java/releases/download/v4.13.0/rmlmapper-4.13.0-r359-all.jar -O tools/rmlmapper.jar
@@ -69,6 +69,9 @@ tools/apache-jena:
 	unzip tools/apache-jena.zip -d tools
 	rm tools/apache-jena.zip
 	cd tools; ln -s apache-jena-4.5.0 apache-jena
+
+tools/apache-jena/lib/sparql-shell-1.0-SNAPSHOT.jar: tools/apache-jena
+	wget https://github.com/sandervd/SPARQL-shell/releases/download/1.0/sparql-shell-1.0-SNAPSHOT.jar -O tools/apache-jena/lib/sparql-shell-1.0-SNAPSHOT.jar
 
 clean:
 	rm workspace/*/* -rf
