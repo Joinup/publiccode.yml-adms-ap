@@ -6,7 +6,7 @@ SOURCE_LANG=$1
 TARGET_LANG=$2
 TEXT=$(cat -)
 
-# Init
+# Setup translation cache dir
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 CACHE_DIR="$SCRIPT_DIR/../.translation_cache/"
 mkdir -p $CACHE_DIR
@@ -23,4 +23,3 @@ then
 	curl -s -H 'Content-Type: application/json' --data-binary "$REQUEST" https://europa.eu/webtools/rest/etrans/translate | jq -r .translation | base64 -d > $CACHE_DIR$CACHE_ID
 fi
 cat $CACHE_DIR$CACHE_ID
-#curl -s -H 'Content-Type: application/json' --data-binary "$REQUEST" https://europa.eu/webtools/rest/etrans/translate | jq -r .translation | base64 -d
