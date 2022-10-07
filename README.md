@@ -9,6 +9,8 @@ The following tools are required on the system.
  -  yq (to transform YAML to JSON)
  -  Java JRE (to run RML Mapper)
  -  wget
+ -  git
+ -  Pearl URI module - Installed with CPAN (`cpan install URI`)
  -  RML Mapper (install by running `make dependencies`)
 
 # Harvesting the 'developers Italia' catalogue
