@@ -1,0 +1,21 @@
+# Run machine translation on non-english descriptions.
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX f: <java:eu.europa.ec.sparql.shell.>
+
+CONSTRUCT {
+  ?solution dct:description ?eng_description .
+}
+WHERE {
+  ?solution a dcat:Dataset .
+  ?solution dct:description ?description .
+  OPTIONAL {
+    ?solution dct:description ?desc_filter .
+    FILTER langMatches( lang(?desc_filter), "en" )
+  }
+  FILTER (!BOUND(?desc_filter))
+
+  BIND(CONCAT("./bin/translate.sh ", LANG(?description), " en") as ?cmd)
+  BIND(f:Exec(?cmd, ?description) as ?eng_description)
+}

@@ -5,8 +5,23 @@ publiccode-rdf := $(subst .git,/publiccode.rdf,$(publiccode))
 
 update: expire workspace/graph.ttl
 
-workspace/graph.ttl: workspace/graph.nt
-	./tools/apache-jena/bin/ntriples --output=turtle namespaces.ttl workspace/graph.nt > workspace/graph.ttl
+workspace/graph.ttl: workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl workspace/inferred-en-description.ttl
+	./tools/apache-jena/bin/ntriples --formatted=turtle namespaces.ttl workspace/inferred-contact-email.ttl workspace/inferred-missing-contacts.ttl workspace/inferred-publisher.ttl workspace/inferred-en-description.ttl > workspace/graph.ttl
+
+# Warning: output contains input graph + inferred triples.
+workspace/inferred-contact-email.ttl: workspace/graph.nt mappings/infer-contact-email.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-contact-email.rq > workspace/inferred-contact-email.ttl
+
+# Warning: output contains inferred triples only.
+workspace/inferred-missing-contacts.ttl: workspace/graph.nt mappings/infer-missing-contact.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-missing-contact.rq > workspace/inferred-missing-contacts.ttl
+
+# Warning: output contains inferred triples only.
+workspace/inferred-publisher.ttl: workspace/graph.nt mappings/infer-publisher.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-publisher.rq > workspace/inferred-publisher.ttl
+
+workspace/inferred-en-description.ttl: workspace/graph.nt mappings/infer-english-description.rq
+	./tools/apache-jena/bin/sparql --data=workspace/graph.nt --query=mappings/infer-english-description.rq > workspace/inferred-en-description.ttl
 
 workspace/graph.nt: $(publiccode-rdf)
 	cat $(publiccode-rdf) > workspace/graph.nt
@@ -41,10 +56,11 @@ create-catalogue-it-data: remove-tracked-repos
 remove-tracked-repos:
 	rm -f tracked-repos/*
 
-dependencies: tools/rmlmapper.jar tools/apache-jena
+dependencies: tools/rmlmapper.jar tools/apache-jena tools/apache-jena/lib/sparql-shell-1.0-SNAPSHOT.jar
 
 tools/rmlmapper.jar:
-	wget https://github.com/RMLio/rmlmapper-java/releases/download/v4.13.0/rmlmapper-4.13.0-r359-all.jar -O tools/rmlmapper.jar
+	# wget https://github.com/RMLio/rmlmapper-java/releases/download/v4.13.0/rmlmapper-4.13.0-r359-all.jar -O tools/rmlmapper.jar
+	wget https://github.com/RMLio/rmlmapper-java/releases/download/v6.0.0/rmlmapper-6.0.0-r363-all.jar -O tools/rmlmapper.jar
 	# Note: Other dependencies are required, such as wget, java-jre, jq and yq.
 
 tools/apache-jena:
@@ -54,8 +70,8 @@ tools/apache-jena:
 	rm tools/apache-jena.zip
 	cd tools; ln -s apache-jena-4.5.0 apache-jena
 
-tools/countries.skos:
-	wget "https://op.europa.eu/o/opportal-service/euvoc-download-handler?cellarURI=http%3A%2F%2Fpublications.europa.eu%2Fresource%2Fcellar%2F8d0ce149-a579-11ec-83e1-01aa75ed71a1.0001.05%2FDOC_1&fileName=countries-skos.rdf" -O tools/countries.skos
+tools/apache-jena/lib/sparql-shell-1.0-SNAPSHOT.jar: tools/apache-jena
+	wget https://github.com/sandervd/SPARQL-shell/releases/download/1.0/sparql-shell-1.0-SNAPSHOT.jar -O tools/apache-jena/lib/sparql-shell-1.0-SNAPSHOT.jar
 
 clean:
 	rm workspace/*/* -rf

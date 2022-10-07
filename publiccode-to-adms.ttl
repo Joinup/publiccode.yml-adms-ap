@@ -1,14 +1,58 @@
+@base <http://example.com/ns#> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ex: <http://example.com/ns#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix fnml:   <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno: 	<https://w3id.org/function/ontology#> .
+@prefix grel:     <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix idlab-fn: <http://example.com/idlab/function/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix place: <http://data.europa.eu/placeholder/> .
 @prefix dct: <http://purl.org/dc/terms/> .
 @prefix adms: <http://www.w3.org/ns/adms#> .
+@prefix v: <http://www.w3.org/2006/vcard/ns#> .
+@prefix dr8: <http://data.europa.eu/dr8/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
+
+# Data source declarations for controlled vocabulary mappings.
+# ADMS status
+ex:triplemap-status a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "../../../mappings/status-mapping.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [
+    rml:reference "subject"
+  ].
+
+# Language
+ex:triplemap-language a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "../../../mappings/language-mapping.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [ 
+    rml:reference "subject"
+  ].
+
+# Country
+ex:triplemap-country a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "../../../mappings/country-mapping.csv" ;
+    rml:referenceFormulation ql:CSV
+  ];
+  rr:subjectMap [
+    rml:reference "uri"
+  ].
+
+
+# Field mappings
+# Description
 [] a rr:TriplesMap;
   rml:logicalSource [
     rml:source "publiccode.json";
@@ -26,108 +70,409 @@
         rml:reference "langcode"
       ]
     ]
-  ].
-
-# Mappings for controlled vocabulary translation.
-# ADMS status
-ex:status-mapping a rr:TriplesMap;
-  rml:logicalSource [
-    rml:source "../../../mappings/status-mapping.csv" ;
-    rml:referenceFormulation ql:CSV
   ];
-  rr:subjectMap [
-    rml:reference "subject"
+  rr:predicateObjectMap [
+    rr:predicate skos:altLabel;
+    rr:objectMap [
+      rml:reference "genericName";
+      rml:languageMap [
+        rml:reference "langcode"
+      ]
+    ]
   ].
 
-# Language
-ex:language-mapping a rr:TriplesMap;
-  rml:logicalSource [
-    rml:source "../../../mappings/language-mapping.csv" ;
-    rml:referenceFormulation ql:CSV
-  ];
-  rr:subjectMap [ 
-    rml:reference "subject"
-  ].
-
-
-
-
+# Contact info terms
 [] a rr:TriplesMap;
   rml:logicalSource [
     rml:source "publiccode.json";
     rml:referenceFormulation ql:JSONPath;
-    rml:iterator "$"
+    rml:iterator "$.maintenance.contacts[*]"
   ];
   rr:subjectMap [
     rml:reference "subject";
-    rr:class dcat:Asset
+  ];
+
+  # Contact info
+  rr:predicateObjectMap [
+    rr:predicate dcat:contactPoint;
+    rr:objectMap [
+      rr:parentTriplesMap ex:triplemap-contact;
+      # Use the contact name to join on the triplemap.
+      rr:joinCondition [
+        rr:child "name";
+        rr:parent "name";
+      ];
+    ];
+  ].
+
+ex:logicsource-publiccode
+    rml:source "publiccode.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$" .
+
+# Creates all triples for the publisher (agent).
+ex:triplemap-agent a rr:TriplesMap;
+  rml:logicalSource ex:logicsource-publiccode;
+  rr:subjectMap [
+    rr:class foaf:Agent;
+    fnml:functionValue [
+      rr:predicateObjectMap [
+        rr:predicate fno:executes ;
+        rr:objectMap [ rr:constant idlab-fn:decide ]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:str ;
+        rr:objectMap [ rml:reference "legal.mainCopyrightOwner"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:expectedStr;
+        rr:objectMap [ rml:reference "legal.mainCopyrightOwner"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:result ;
+        rr:objectMap [
+          fnml:functionValue [
+            rr:predicateObjectMap [
+              rr:predicate fno:executes ;
+              rr:objectMap [ rr:constant idlab-fn:concat ]
+            ];
+            rr:predicateObjectMap [
+              rr:predicate idlab-fn:delimiter ;
+              rr:objectMap [ rr:constant "/publisher/"]
+            ];
+            rr:predicateObjectMap [
+              rr:predicate idlab-fn:str;
+              rr:objectMap [ rml:reference "subject"]
+            ];
+            rr:predicateObjectMap [
+              rr:predicate idlab-fn:otherStr ;
+              rr:objectMap [
+                fnml:functionValue [
+                  rr:predicateObjectMap [
+                    rr:predicate fno:executes ;
+                    rr:objectMap [ rr:constant idlab-fn:slugify ]
+                  ];
+                  rr:predicateObjectMap [
+                    rr:predicate idlab-fn:str ;
+                    rr:objectMap [ rml:reference "legal.mainCopyrightOwner"]
+                  ];
+                ];
+              ]
+            ];
+          ];
+        ]
+      ];
+    ];
+  ];
+  rr:predicateObjectMap [
+    rr:predicate foaf:name;
+    rr:objectMap [
+      rml:reference "legal.mainCopyrightOwner"
+    ]
+  ].
+
+# Creates all triples for the Distribution
+ex:triplemap-distribution a rr:TriplesMap;
+  rml:logicalSource ex:logicsource-publiccode;
+  rr:subjectMap [
+    rr:class dcat:Distribution ;
+    fnml:functionValue [
+      rr:predicateObjectMap [
+        rr:predicate fno:executes ;
+        rr:objectMap [ rr:constant idlab-fn:decide ]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:str ;
+        rr:objectMap [ rml:reference "subject"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:expectedStr;
+        rr:objectMap [ rml:reference "subject"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:result ;
+        rr:objectMap [
+          fnml:functionValue [
+            rr:predicateObjectMap [
+              rr:predicate fno:executes ;
+              rr:objectMap [ rr:constant idlab-fn:concat ]
+            ];
+            rr:predicateObjectMap [
+              rr:predicate idlab-fn:str;
+              rr:objectMap [ rml:reference "subject"]
+            ];
+            rr:predicateObjectMap [
+              rr:predicate idlab-fn:otherStr ;
+              rr:objectMap [
+                rr:constant "/distribution"
+              ]
+            ];
+          ];
+        ]
+      ];
+    ];
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:license ;
+    rr:objectMap [
+      rr:template "http://spdx.org/licenses/{legal.license}"
+    ]
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dcat:accessURL ;
+    rr:objectMap [
+      rml:reference "url" ;
+      rr:termType rr:IRI
+    ]
   ];
   rr:predicateObjectMap [
     rr:predicate dct:title;
     rr:objectMap [
       rml:reference "name"
     ]
+  ].
+
+# Creates all triples in the blanknode for the contact info (v:Kind).
+ex:triplemap-contact a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "publiccode.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$.maintenance.contacts[*]"
   ];
+  rr:subjectMap [
+    rr:class v:Kind;
+    fnml:functionValue [
+      rr:predicateObjectMap [
+        rr:predicate fno:executes ;
+        rr:objectMap [ rr:constant idlab-fn:concat ]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:delimiter ;
+        rr:objectMap [ rr:constant "/contact/"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:str;
+        rr:objectMap [ rml:reference "subject"]
+      ];
+      rr:predicateObjectMap [
+        rr:predicate idlab-fn:otherStr ;
+        rr:objectMap [
+          fnml:functionValue [
+            rr:predicateObjectMap [
+              rr:predicate fno:executes ;
+              rr:objectMap [ rr:constant idlab-fn:slugify ]
+            ];
+            rr:predicateObjectMap [
+              rr:predicate idlab-fn:str ;
+              rr:objectMap [ rml:reference "name"]
+            ];
+          ];
+        ]
+      ];
+    ];
+  ];
+  # Contact - name
+  rr:predicateObjectMap [
+    rr:predicate v:fn;
+    rr:objectMap [
+      rml:reference "name"
+    ]
+  ];
+  # Contact - email
+  rr:predicateObjectMap [
+    rr:predicate v:hasEmail;
+    rr:objectMap [
+      rml:reference "email"
+    ]
+  ];
+  # Contact - phone
+  rr:predicateObjectMap [
+    rr:predicate v:hasTelephone;
+    rr:objectMap [
+      rml:reference "phone"
+    ]
+  ].
+
+ex:triplemap-main a rr:TriplesMap;
+  rml:logicalSource ex:logicsource-publiccode;
+  rr:subjectMap [
+    rml:reference "subject";
+    rr:class dcat:Dataset
+  ];
+  # Title
+  rr:predicateObjectMap [
+    rr:predicate dct:title;
+    rr:objectMap [
+      rml:reference "name"
+    ]
+  ];
+  # Publisher
   rr:predicateObjectMap [
     rr:predicate dct:publisher;
     rr:objectMap [
-      rml:reference "legal.mainCopyrightOwner"
-    ]
+      rr:parentTriplesMap ex:triplemap-agent;
+      # Use the publisher name to join on the triplemap.
+      rr:joinCondition [
+        rr:child "legal.mainCopyrightOwner";
+        rr:parent "legal.mainCopyrightOwner";
+      ];
+    ];
   ];
+  # Distribution
+  rr:predicateObjectMap [
+    rr:predicate dcat:distribution;
+    rr:objectMap [
+      rr:parentTriplesMap ex:triplemap-distribution;
+      # Use the publisher name to join on the triplemap.
+      rr:joinCondition [
+        rr:child "url";
+        rr:parent "url";
+      ];
+    ];
+  ];
+  # Keyword
   rr:predicateObjectMap [
     rr:predicate dcat:keyword;
     rr:objectMap [
       rml:reference "intendedAudience.scope"
     ]
   ];
+  # LandingURL
   rr:predicateObjectMap [
     rr:predicate dcat:landingPage;
     rr:objectMap [
       rml:reference "landingURL"
     ]
   ];
+  # Theme
   rr:predicateObjectMap [
     rr:predicate dcat:theme;
     rr:objectMap [
       rml:reference "categories"
     ]
   ];
+  # Language
+  # As joining two arrays seems broken, access available languages one by one. Assume max 3 languages.
+  # First element
   rr:predicateObjectMap [
     rr:predicate dct:language;
     rr:objectMap [
-      rml:reference "localisation.availableLanguages[*]";
-      #rr:parentTriplesMap ex:language-mapping;
-      #rr:joinCondition [
-      #  rr:child "localisation.availableLanguages[*]";
-      #  rr:parent "langcode";
-      #];
+      rr:parentTriplesMap ex:triplemap-language;
+      rr:joinCondition [
+        rr:child "localisation.availableLanguages[0]";
+        rr:parent "langcode";
+      ];
     ]
-  ];  
+  ];
   rr:predicateObjectMap [
-    rr:predicate dct:relation;
+    rr:predicate dct:language;
     rr:objectMap [
-      rml:reference "isBasedOn"
+      rr:parentTriplesMap ex:triplemap-language;
+      rr:joinCondition [
+        rr:child "localisation.availableLanguages[1]";
+        rr:parent "langcode";
+      ];
     ]
-  ];  
+  ];
+  rr:predicateObjectMap [
+    rr:predicate dct:language;
+    rr:objectMap [
+      rr:parentTriplesMap ex:triplemap-language;
+      rr:joinCondition [
+        rr:child "localisation.availableLanguages[2]";
+        rr:parent "langcode";
+      ];
+    ]
+  ];
+  # Relation
+  #rr:predicateObjectMap [
+  #  rr:predicate dct:relation;
+  #  rr:objectMap [
+  #    rml:reference "isBasedOn" ;
+  #    rr:termType rr:IRI
+  #  ]
+  #];
+  # Modified
+  rr:predicateObjectMap [
+    rr:predicate dct:modified;
+    rr:objectMap [
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes ;
+          rr:objectMap [ rr:constant idlab-fn:normalizeDateTime ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate idlab-fn:pattern ;
+          rr:objectMap [ rr:constant "yyyy-MM-dd mm:HH"]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate idlab-fn:strDate ;
+          rr:objectMap [ rml:reference "releaseDate"]
+        ];
+      ];
+      rr:datatype xsd:dateTime
+    ]
+  ];
+  # Version
+  rr:predicateObjectMap [
+    rr:predicate owl:versionInfo;
+    rr:objectMap [
+      rml:reference "softwareVersion"
+    ]
+  ];
+  # Same issue with countries, handle max 3 items one by one.
   rr:predicateObjectMap [
     rr:predicate dct:spatial;
     rr:objectMap [
-      rml:reference "intendedAudience.countries"
+      rr:parentTriplesMap ex:triplemap-country;
+      rr:joinCondition [
+        rr:child "intendedAudience.countries[0]";
+        rr:parent "code";
+      ];
     ]
   ];
   rr:predicateObjectMap [
-    rr:predicate adms:includedAsset;
+    rr:predicate dct:spatial;
     rr:objectMap [
-      rml:reference "dependsOn.open[*].name"
+      rr:parentTriplesMap ex:triplemap-country;
+      rr:joinCondition [
+        rr:child "intendedAudience.countries[1]";
+        rr:parent "code";
+      ];
     ]
   ];
+  rr:predicateObjectMap [
+    rr:predicate dct:spatial;
+    rr:objectMap [
+      rr:parentTriplesMap ex:triplemap-country;
+      rr:joinCondition [
+        rr:child "intendedAudience.countries[2]";
+        rr:parent "code";
+      ];
+    ]
+  ];
+  # Included asset
+  #rr:predicateObjectMap [
+  #  rr:predicate adms:includedAsset;
+  #  rr:objectMap [
+  #    rml:reference "dependsOn.open[*].name"
+  #  ]
+  #];
+  # Status
   rr:predicateObjectMap [
     rr:predicate adms:status;
     rr:objectMap [
-      rr:parentTriplesMap ex:status-mapping;
+      rr:parentTriplesMap ex:triplemap-status;
       rr:joinCondition [
         rr:child "developmentStatus";
         rr:parent "developmentStatus";
       ];
     ]
   ].
+  # EIRA ABB is required, so add static mapping :)
+  #rr:predicateObjectMap [
+  #  rr:predicate dct:relation;
+  #  rr:objectMap [
+  #    rr:constant dr8:DigitalSolution
+  #  ]
+  #].

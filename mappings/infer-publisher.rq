@@ -1,0 +1,22 @@
+# Hack to infer a pseudo publisher from the respository name.
+
+PREFIX dcat: <http://www.w3.org/ns/dcat#>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+CONSTRUCT 
+{
+  ?solution dct:publisher ?publisher_uri .
+  ?publisher_uri foaf:name ?title .
+  ?publisher_uri a foaf:Agent
+}
+WHERE
+{ 
+  ?solution a dcat:Dataset .
+  ?solution dct:title ?title .
+  OPTIONAL {
+    ?solution dct:publisher ?publisher .
+  }
+  FILTER (!bound(?publisher)) .
+  BIND(URI(CONCAT(STR( ?solution ), "/publisher"))  AS ?publisher_uri ) .
+}
