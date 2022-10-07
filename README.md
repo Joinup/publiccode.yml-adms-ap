@@ -1,7 +1,22 @@
 # Publiccode.yml to ADMS-AP knowledge graph generation
 This tool tracks publiccode.yml repositories, and (aims to) generates an ADMS-AP complient knowledge graph from them.
 
-# Install
+# Run through docker
+After cloning the repository, cd into the directory and run
+```bash
+docker build . -t publiccode -f .
+```
+You can swap the `publiccode` with any keyword but remember that this is the tag name.
+
+Then, you can start the container using:
+```bash
+docker run -v "workspace:/build/workspace" -it publiccode
+```
+
+and then `cd` into the `/build` directory.
+All data will be generated in the workspace directory locally which is mapped to the corresponding workspace directory in the container.
+
+# Install locally
 The following tools are required on the system.
 
  -  GNU make
@@ -12,6 +27,8 @@ The following tools are required on the system.
  -  git
  -  Pearl URI module - Installed with CPAN (`cpan install URI`)
  -  RML Mapper (install by running `make dependencies`)
+ -  Golang-go
+ -  [pcvalidate package](https://github.com/italia/publiccode-parser-go)
 
 # Harvesting the 'developers Italia' catalogue
 First, update the list of tracked repositories with the state of the upstream catalogue.

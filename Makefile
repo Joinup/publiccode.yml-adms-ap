@@ -18,7 +18,7 @@ workspace/publiccode/%/publiccode.yml: workspace/cloned-repos/%.git
 	mkdir -p workspace/publiccode/$(*F)
 	-git -C $^ cat-file blob HEAD:publiccode.yml > $@
 #	If the publiccode.yml file isn't valid, blank it out to avoid downstream issues.
-	@docker run -i italia/publiccode-parser-go /dev/stdin < $@ > /dev/null 2>&1 || (echo "" > $@ && echo "\033[0;31mWARNING: File not conformant to publiccode.yml $@\033[0m (skipping)")
+	$(pcvalidate) && pcvalidate $@ > /dev/null 2>&1 || (echo "" > $@ && echo "\033[0;31mWARNING: File not conformant to publiccode.yml $@\033[0m (skipping)")
 
 workspace/publiccode/%/publiccode.json: workspace/publiccode/%/publiccode.yml
 	-./bin/convert-yaml-to-json.sh $^ > $@
@@ -67,4 +67,4 @@ clean:
 .PRECIOUS: workspace/cloned-repos/%.git workspace/publiccode/%/publiccode.yml workspace/publiccode/%/publiccode.json
 
 # For performance, no need to process old suffix rules.
-.SUFFIXES:  
+.SUFFIXES:
