@@ -80,10 +80,10 @@ You can swap the `publiccode` with any keyword but remember that this is the tag
 
 Then, you can start the container using:
 ```bash
-docker run -v "workspace:/build/workspace" -it publiccode
+docker run -v "workspace:/app/workspace" -it publiccode
 ```
 
-and then `cd` into the `/build` directory.
+and then `cd` into the `/app` directory.
 All data will be generated in the workspace directory locally which is mapped to the corresponding workspace directory in the container.
 
 # Install locally
