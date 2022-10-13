@@ -1,12 +1,12 @@
 # Harvesting publiccode.yml catalogues
-Catalogues like Joinup facilitate the discoverability of reusable interoperability solutions. 
+Catalogues like Joinup facilitate the discoverability of reusable interoperability solutions.
 Often, similar initiatives exists at the memberstate level, which leads to the possibility of federating those catalogues at the european level.
 
 Two datastandards are currently in use for building such catalogues, each with its specificities.
 
 ## ADMS-AP
 This specification covers the full domain of asset catalogues, including the description of the catalogue itself.
-Its model is based on linked data (RDF), which makes offers advantages when combining data from multiple sources. 
+Its model is based on linked data (RDF), which makes offers advantages when combining data from multiple sources.
 It's most important traits are:
 - Relatively difficult to implement
 - Describes: Interoperability solutions (open source software, standards & specifications, methodologies,...)
@@ -37,7 +37,7 @@ The only public catalogue identified today is the one provided by 'Team digitale
 Each of the repositories identified gets 'tracked', meaning that the URL of the repository is registered.
 
 ## Each repository: from publiccode.yml to RDF
-The following operations are executed for each repository. The steps are executed in order for each repository. 
+The following operations are executed for each repository. The steps are executed in order for each repository.
 
 ### Fetching the repositories
 The git repositories are then fetched:
@@ -71,7 +71,22 @@ All the individual transformed repositories are now brought togheter in one big 
 ## Upload to Joinup
 The resulting ADMS-AP file can now be uploaded to Joinup for import into a Joinup collection.
 
-# Install
+# Run through docker
+After cloning the repository, cd into the directory and run
+```bash
+docker build . -t publiccode -f .
+```
+You can swap the `publiccode` with any keyword but remember that this is the tag name.
+
+Then, you can start the container using:
+```bash
+docker run -v "workspace:/app/workspace" -it publiccode
+```
+
+and then `cd` into the `/app` directory.
+All data will be generated in the workspace directory locally which is mapped to the corresponding workspace directory in the container.
+
+# Install locally
 The following tools are required on the system.
 
  -  GNU make (part of the `build-essential` package for UNIX)
@@ -79,10 +94,13 @@ The following tools are required on the system.
  -  [yq](https://github.com/mikefarah/yq) (to transform YAML to JSON) - version > 4.25.0 required
  -  Java JRE (to run RML Mapper)
  -  wget
+ -  git
+ -  Pearl URI module - Installed with CPAN (`cpan install URI`)
  -  RML Mapper. Install by running `make dependencies` after you have installed the above packages.
  Please, note that this will install RML and Apache Jena in `tools` directory.
  Deleting the contents of the `tools` directory will result in having to
- re-install the dependencies.
+ re-install the dependencies. -  Golang-go
+ -  [pcvalidate package](https://github.com/italia/publiccode-parser-go)
 
 # Harvesting the 'developers Italia' catalogue
 First, update the list of tracked repositories with the state of the upstream catalogue.
@@ -118,4 +136,3 @@ curl -H "Authorization: token YOUR_PERSONAL_GITHUB_TOKEN" -H "Accept: applicatio
 cat test/list-of-repos.json | jq '.items[].repository.html_url' -r | sed 's/$/.git/' > test/list-of-repos.txt
 cat test/list-of-repos.txt | xargs -n 1 ./repo-add.sh
 ```
-
